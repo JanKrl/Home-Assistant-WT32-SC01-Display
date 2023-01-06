@@ -1,0 +1,21 @@
+alias: MQTT alarm panel pin keys
+sequence:
+  - if:
+      - condition: template
+        value_template: "{{ (message | string) == 'Clear' }}"
+    then:
+      - service: input_text.set_value
+        data:
+          value: "{{ null }}"
+        target:
+          entity_id: input_text.mqtt_pin
+    else:
+      - service: input_text.set_value
+        data:
+          value: "{{ states('input_text.mqtt_pin') }}{{ message }}"
+        target:
+          entity_id: input_text.mqtt_pin
+  - service: script.mqtt_alarm_panel_refresh_code
+    data: {}
+mode: queued
+max: 10

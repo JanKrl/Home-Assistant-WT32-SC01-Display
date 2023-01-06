@@ -1,0 +1,9 @@
+alias: MQTT alarm panel refresh code
+sequence:
+  - service: mqtt.publish
+    data:
+      topic: hasp/plate1/command
+      payload_template: >-
+        p1b1.text {{ states('input_text.mqtt_pin')|length * "*" if
+        states('input_text.mqtt_pin')|length > 0 else '----' }}
+mode: single
