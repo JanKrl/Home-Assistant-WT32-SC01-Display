@@ -1,0 +1,121 @@
+plate1:
+  objects:
+    ### Header ###
+    - obj: "p0b2" # Date / time
+      properties:
+        "text": "{{ strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').strftime('%a, %b %d %H:%M') }}"
+    - obj: "p0b3" # Weather
+      properties:
+        "text": >
+          {{states('weather.forecast_home').capitalize().replace('-', ' ')}}
+          {{state_attr('weather.forecast_home', 'temperature')}}
+          {{state_attr('weather.forecast_home', 'temperature_unit')}}
+          {{state_attr('weather.forecast_home', 'wind_speed')|int}}
+          {{state_attr('weather.forecast_home', 'wind_speed_unit')}}
+
+    ### Alarm panel ###
+    - obj: "p1b5" # Status LED
+      properties:
+        "val": >
+          {% if states('alarm_control_panel.home_alarm') == 'disarmed' %}
+          50
+          {% elif 'armed_' in states('alarm_control_panel.home_alarm')|string %}
+          255
+          {% elif states('alarm_control_panel.home_alarm')|string in ['pending', 'arming', 'disarming'] %}
+          150
+          {% else %}
+          0
+          {% endif %}
+
+    - obj: "p1b4" # Status label
+      properties:
+        "text": "{{ states('alarm_control_panel.home_alarm').capitalize().replace('_', ' ') }}"
+    - obj: "p1b3" # Arm / disarm buttons
+      properties:
+        "options": >
+          {% if states('alarm_control_panel.home_alarm') == 'disarmed' %}
+            ['Arm away', 'Arm vacation']
+          {% else %}
+            ['Disarm']
+          {% endif %}
+      event:
+        "down":
+          - service: script.mqtt_alarm_panel_arm_keys
+    - obj: "p1b2" # Pin buttons
+      event:
+        "down":
+          - service: script.mqtt_alarm_panel_pin_keys
+            data:
+              message: "{{ text }}"
+
+    ### Weather ###
+    - obj: "p2b1" # Icon
+      properties:
+        "src": "{{ 'L:/z-128-' + states('weather.forecast_home') + '.png'}}"
+
+    - obj: "p2b2" # Current temp (you can use your own outdoor temp sensor if you have one)
+      properties:
+        "text": "Updated {{ states.weather.forecast_home.last_updated.strftime('%b-%d %H:%M') }}"
+
+    - obj: "p2b3" # Current temp (you can use your own outdoor temp sensor if you have one)
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'temperature') |string + state_attr('weather.forecast_home', 'temperature_unit') |string}}"
+
+    - obj: "p2b4" # Current weather condition
+      properties:
+        "text": "{{ states('weather.forecast_home').capitalize().replace('-', ' ') }}"
+
+    # Day +1
+    - obj: "p2b11"
+      properties:
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[0].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+    - obj: "p2b12"
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'forecast')[0].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
+    - obj: "p2b13"
+      properties:
+        "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[0].condition + '.png' }}"
+
+    # Day +2
+    - obj: "p2b21"
+      properties:
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[1].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+    - obj: "p2b22"
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'forecast')[1].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
+    - obj: "p2b23"
+      properties:
+        "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[1].condition + '.png' }}"
+
+    # Day +3
+    - obj: "p2b31"
+      properties:
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[2].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+    - obj: "p2b32"
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'forecast')[2].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
+    - obj: "p2b33"
+      properties:
+        "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[2].condition + '.png' }}"
+
+    # Day +4
+    - obj: "p2b41"
+      properties:
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[3].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+    - obj: "p2b42"
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'forecast')[3].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
+    - obj: "p2b43"
+      properties:
+        "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[3].condition + '.png' }}"
+
+    # Day +5
+    - obj: "p2b51"
+      properties:
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[4].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+    - obj: "p2b52"
+      properties:
+        "text": "{{ state_attr('weather.forecast_home', 'forecast')[4].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
+    - obj: "p2b53"
+      properties:
+        "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[4].condition + '.png' }}"
