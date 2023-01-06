@@ -1,0 +1,22 @@
+alias: MQTT anti-burn-in start at night
+description: ""
+trigger:
+  - platform: time
+    at: "00:20:00"
+  - platform: time
+    at: "01:20:00"
+  - platform: time
+    at: "02:20:00"
+  - platform: time
+    at: "03:20:00"
+  - platform: time
+    at: "04:20:00"
+  - platform: time
+    at: "05:20:00"
+condition: []
+action:
+  - service: mqtt.publish
+    data:
+      topic: hasp/plates/command/antiburn
+      payload: "1"
+mode: single
