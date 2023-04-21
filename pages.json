@@ -45,7 +45,9 @@
 {"page":3,"id":2,"obj":"btn","x":20,"y":360,"w":280,"h":90,"text":"Switch all lights off"}
 {"page":4,"id":0,"prev":3,"next":1}
 {"page":4,"id":1,"obj":"label","x":20,"y":70,"w":150,"h":30,"text":"Shutters"}
-{"page":4,"id":2,"obj":"label","x":80,"y":110,"w":150,"h":30,"text":"Right"}
-{"page":4,"id":3,"obj":"label","x":200,"y":110,"w":150,"h":30,"text":"Left"}
-{"page":4,"id":4,"obj":"slider","x":90,"y":180,"w":30,"h":250,"min":0,"max":100,"val":100}
-{"page":4,"id":5,"obj":"slider","x":210,"y":180,"w":30,"h":250,"min":0,"max":100,"val":100}
+{"page":4,"id":2,"obj":"label","x":85,"y":110,"w":150,"h":30,"text":"Right"}
+{"page":4,"id":3,"obj":"label","x":205,"y":110,"w":150,"h":30,"text":"Left"}
+{"page":4,"id":4,"obj":"slider","x":90,"y":180,"w":30,"h":250,"min":0,"max":100,"val":50}
+{"page":4,"id":5,"obj":"slider","x":210,"y":180,"w":30,"h":250,"min":0,"max":100,"val":50}
+{"page":4,"id":6,"obj":"label","x":85,"y":440,"w":150,"h":30,"text":"--%"}
+{"page":4,"id":7,"obj":"label","x":205,"y":440,"w":150,"h":30,"text":"--%"}
