@@ -1,32 +1,51 @@
 plate1:
   objects:
     ### Header ###
+    - obj: "p0b1" # Wi-Fi signal strength indicator
+      properties:
+        "text_color": >
+          {% if -30 <= state_attr('openhasp.plate1','rssi') |int %}
+          green
+          {% elif -31 > state_attr('openhasp.plate1','rssi') |int >= -50 %}
+          orange
+          {% elif -51 > state_attr('openhasp.plate1','rssi') |int >= -80 %}
+          tomato
+          {% else %}
+          red
+          {% endif %}
+
     - obj: "p0b2" # Date / time
       properties:
         "text": "{{ strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').strftime('%a, %b %d %H:%M') }}"
-    - obj: "p0b3" # Weather
-      properties:
-        "text": >
-          {{states('weather.forecast_home').capitalize().replace('-', ' ')}}
-          {{state_attr('weather.forecast_home', 'temperature')}}
-          {{state_attr('weather.forecast_home', 'temperature_unit')}}
-          {{state_attr('weather.forecast_home', 'wind_speed')|int}}
-          {{state_attr('weather.forecast_home', 'wind_speed_unit')}}
+    # REMOVED #
+    # - obj: "p0b3" # Weather
+    #   properties:
+    #     "text": >
+    #       {{states('weather.forecast_home').capitalize().replace('-', ' ')}}
+    #       {{state_attr('weather.forecast_home', 'temperature')}}
+    #       {{state_attr('weather.forecast_home', 'temperature_unit')}}
+    #       {{state_attr('weather.forecast_home', 'wind_speed')|int}}
+    #       {{state_attr('weather.forecast_home', 'wind_speed_unit')}}
 
     ### Alarm panel ###
-    - obj: "p1b5" # Status LED
+    - obj: "p1b5" # Status spinner
       properties:
-        "val": >
+        "line_color10": >
           {% if states('alarm_control_panel.home_alarm') == 'disarmed' %}
-          50
+          cyan
           {% elif 'armed_' in states('alarm_control_panel.home_alarm')|string %}
-          255
+          green
           {% elif states('alarm_control_panel.home_alarm')|string in ['pending', 'arming', 'disarming'] %}
-          150
+          orange
           {% else %}
-          0
+          white
           {% endif %}
-
+        "angle": >
+          {% if states('alarm_control_panel.home_alarm')|string in ['pending', 'arming', 'disarming'] %}
+          60
+          {% else %}
+          359
+          {% endif %}
     - obj: "p1b4" # Status label
       properties:
         "text": "{{ states('alarm_control_panel.home_alarm').capitalize().replace('_', ' ') }}"
@@ -41,6 +60,8 @@ plate1:
       event:
         "down":
           - service: script.mqtt_alarm_panel_arm_keys
+            data:
+              message: "{{ text }}"
     - obj: "p1b2" # Pin buttons
       event:
         "down":
@@ -68,7 +89,7 @@ plate1:
     # Day +1
     - obj: "p2b11"
       properties:
-        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[0].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[0].datetime[:10], '%Y-%m-%d').strftime('%a, %b %d') }}"
     - obj: "p2b12"
       properties:
         "text": "{{ state_attr('weather.forecast_home', 'forecast')[0].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
@@ -79,7 +100,7 @@ plate1:
     # Day +2
     - obj: "p2b21"
       properties:
-        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[1].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[1].datetime[:10], '%Y-%m-%d').strftime('%a, %b %d') }}"
     - obj: "p2b22"
       properties:
         "text": "{{ state_attr('weather.forecast_home', 'forecast')[1].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
@@ -90,7 +111,7 @@ plate1:
     # Day +3
     - obj: "p2b31"
       properties:
-        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[2].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[2].datetime[:10], '%Y-%m-%d').strftime('%a, %b %d') }}"
     - obj: "p2b32"
       properties:
         "text": "{{ state_attr('weather.forecast_home', 'forecast')[2].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
@@ -101,7 +122,7 @@ plate1:
     # Day +4
     - obj: "p2b41"
       properties:
-        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[3].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[3].datetime[:10], '%Y-%m-%d').strftime('%a, %b %d') }}"
     - obj: "p2b42"
       properties:
         "text": "{{ state_attr('weather.forecast_home', 'forecast')[3].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
@@ -112,10 +133,91 @@ plate1:
     # Day +5
     - obj: "p2b51"
       properties:
-        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[4].datetime[:10], '%Y-%m-%d').strftime('%A, %b %d') }}"
+        "text": "{{ strptime(state_attr('weather.forecast_home', 'forecast')[4].datetime[:10], '%Y-%m-%d').strftime('%a, %b %d') }}"
     - obj: "p2b52"
       properties:
         "text": "{{ state_attr('weather.forecast_home', 'forecast')[4].temperature}} {{ state_attr('weather.forecast_home', 'temperature_unit') }}"
     - obj: "p2b53"
       properties:
         "src": "{{ 'L:/z-32-' + state_attr('weather.forecast_home', 'forecast')[4].condition + '.png' }}"
+
+    ### Lights ###
+    - obj: "p3b11"
+      properties:
+        "val": "{{ 1 if states('light.living_room') == 'on' else 0 }}"
+      event:
+        "down":
+          - service: light.toggle
+            target:
+              entity_id: light.living_room
+    - obj: "p3b21"
+      properties:
+        "val": "{{ 1 if states('light.office') == 'on' else 0 }}"
+      event:
+        "down":
+          - service: light.toggle
+            target:
+              entity_id: light.office
+    - obj: "p3b31"
+      properties:
+        "val": "{{ 1 if states('light.bathroom') == 'on' else 0 }}"
+      event:
+        "down":
+          - service: light.toggle
+            target:
+              entity_id: light.bathroom
+    - obj: "p3b41"
+      properties:
+        "val": "{{ 1 if states('light.kitchen') == 'on' else 0 }}"
+      event:
+        "down":
+          - service: light.toggle
+            target:
+              entity_id: light.kitchen
+    - obj: "p3b51"
+      properties:
+        "val": "{{ 1 if states('light.bedroom') == 'on' else 0 }}"
+      event:
+        "down":
+          - service: light.toggle
+            target:
+              entity_id: light.bedroom
+    - obj: "p3b2"
+      event:
+        "down":
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.living_room
+                - light.office
+                - light.bathroom
+                - light.kitchen
+                - light.bedroom
+
+    ## Shutters ##
+    - obj: "p4b4"
+      properties:
+        "val": "{{ state_attr('cover.shutter_right', 'current_position') | int }}"
+      event:
+        "up":
+          - service: cover.set_cover_position
+            target:
+              entity_id: cover.shutter_right
+            data:
+              position: "{{  val |int }}"
+    - obj: "p4b5"
+      properties:
+        "val": "{{ state_attr('cover.shutter_left', 'current_position') | int }}"
+      event:
+        "up":
+          - service: cover.set_cover_position
+            target:
+              entity_id: cover.shutter_left
+            data:
+              position: "{{ val |int }}"
+    - obj: "p4b6"
+      properties:
+        "text": "{{ state_attr('cover.shutter_right', 'current_position') |string }}%"
+    - obj: "p4b7"
+      properties:
+        "text": "{{ state_attr('cover.shutter_left', 'current_position') |string }}%"
